@@ -5,7 +5,7 @@ import 'object_detection_screen.dart';
 class CombinedScreen extends StatelessWidget {
   final String destination;
 
-  CombinedScreen({required this.destination});
+  const CombinedScreen({super.key, required this.destination});
 
   @override
   Widget build(BuildContext context) {
