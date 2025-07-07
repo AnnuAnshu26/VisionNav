@@ -6,8 +6,6 @@ import '../platform_view_registry_stub.dart'
     if (dart.library.html) '../platform_view_registry_web.dart';
 
 class ObjectDetectionScreen extends StatefulWidget {
-  const ObjectDetectionScreen({super.key});
-
   @override
   _ObjectDetectionScreenState createState() => _ObjectDetectionScreenState();
 }

@@ -25,10 +25,10 @@ void main() {
     });
   }
 
-  runApp(VoiceGuideApp());
+  runApp(VisionNav());
 }
 
-class VoiceGuideApp extends StatelessWidget {
+class VisionNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
