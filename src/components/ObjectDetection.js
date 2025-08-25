@@ -1,6 +1,8 @@
+// components/ObjectDetection.js
 import React, { useEffect, useRef, useState } from "react";
+import "@tensorflow/tfjs"; // must be imported before coco-ssd
 
-// Required libraries to install:
+// Required libraries:
 // npm i @tensorflow/tfjs @tensorflow-models/coco-ssd
 
 const ObjectDetection = () => {
@@ -8,18 +10,31 @@ const ObjectDetection = () => {
   const canvasRef = useRef(null);
   const [status, setStatus] = useState("Idle");
 
+  // For throttled + limited voice alerts
+  const lastSpokenRef = useRef({});
+  const speakCountsRef = useRef({});
+  const SPEAK_INTERVAL = 5000; // ms between repeating same object
+  const MAX_SPEAKS = 3;        // max announcements per object
+
+  // Simple speech function
+  const speak = (text) => {
+    console.log("🔊", text);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-IN";
+    window.speechSynthesis.speak(utterance);
+  };
+
   useEffect(() => {
     let stream = null;
     let isMounted = true;
     let model = null;
-    let raf = 0; // requestAnimationFrame ID
+    let raf = 0;
 
     const setup = async () => {
       try {
         setStatus("Loading model…");
-        const [{ load }, tf] = await Promise.all([
+        const [{ load }] = await Promise.all([
           import("@tensorflow-models/coco-ssd"),
-          import("@tensorflow/tfjs"),
         ]);
         model = await load({ base: "lite_mobilenet_v2" });
 
@@ -30,7 +45,7 @@ const ObjectDetection = () => {
           video: { facingMode: "environment" },
           audio: false,
         });
-        
+
         if (!videoRef.current) return;
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -38,14 +53,14 @@ const ObjectDetection = () => {
         setStatus("Detecting…");
         detect();
       } catch (e) {
-        console.error(e);
+        console.error("❌ Setup error:", e);
         setStatus("Camera or model error");
       }
     };
 
     const draw = (preds) => {
       if (!videoRef.current || !canvasRef.current) return;
-      
+
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
@@ -66,20 +81,42 @@ const ObjectDetection = () => {
         ctx.strokeRect(x, y, w, h);
         ctx.fillRect(x, y, w, h);
         ctx.fillStyle = "#00ff88";
-        ctx.fillText(`${p.class} (${(p.score * 100).toFixed(0)}%)`, x + 4, y > 12 ? y - 4 : y + 14);
+        ctx.fillText(
+          `${p.class} (${(p.score * 100).toFixed(0)}%)`,
+          x + 4,
+          y > 12 ? y - 4 : y + 14
+        );
       });
     };
 
     const detect = async () => {
       if (!isMounted || !model || !videoRef.current) return;
       const predictions = await model.detect(videoRef.current);
+
+      // Draw to canvas
       draw(predictions);
+
+      // Speak detected objects (throttled + limited)
+      predictions.forEach((p) => {
+        if (p.score > 0.6) {
+          const now = Date.now();
+          const last = lastSpokenRef.current[p.class] || 0;
+          const count = speakCountsRef.current[p.class] || 0;
+
+          if (count < MAX_SPEAKS && now - last > SPEAK_INTERVAL) {
+            speak(`Detected ${p.class}`);
+            lastSpokenRef.current[p.class] = now;
+            speakCountsRef.current[p.class] = count + 1;
+          }
+        }
+      });
+
       raf = requestAnimationFrame(detect);
     };
 
     setup();
 
-    // Cleanup function
+    // Cleanup
     return () => {
       isMounted = false;
       if (raf) cancelAnimationFrame(raf);
@@ -91,15 +128,31 @@ const ObjectDetection = () => {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* Video element is hidden and used as the source for the canvas */}
+      {/* Hidden video feed */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "none", background: "#000" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "none",
+          background: "#000",
+        }}
       />
-      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block", background: "#000" }} />
+      {/* Visible canvas with detections */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "block",
+          background: "#000",
+        }}
+      />
+      {/* Status overlay */}
       <div
         style={{
           position: "absolute",

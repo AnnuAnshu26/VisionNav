@@ -16,7 +16,7 @@ function HomePage() {
 
       {/* Mic Section is now a STATUS INDICATOR, not a button */}
       <div className="mic-section">
-        <div 
+        <div
           className="mic-button listening-effect" // Always has the listening effect
           aria-label="Microphone status"
         >
@@ -45,6 +45,8 @@ function HomePage() {
         <div className="nav-item active" onClick={() => navigate('/')}>Home</div>
         <div className="nav-item" onClick={() => navigate('/settings')}>Settings</div>
         <div className="nav-item" onClick={() => navigate('/profile')}>Profile</div>
+        <div className="nav-item" onClick={() => navigate('/report')}>Report</div>
+
       </div>
     </div>
   );

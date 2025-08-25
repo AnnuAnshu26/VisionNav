@@ -203,3 +203,11 @@ body {
 p{
   color: black;
 }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+}
