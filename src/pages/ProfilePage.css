@@ -1,0 +1,17 @@
+.profile-container {
+  padding: 2rem;
+  text-align: center;
+  font-family: sans-serif;
+}
+.profile-card {
+  background: white;
+  display: inline-block;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+.profile-card p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}

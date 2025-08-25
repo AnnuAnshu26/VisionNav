@@ -1,7 +1,8 @@
+// src/pages/DetectionPage.jsx
 import React from "react";
 import VoiceHandler from "../components/VoiceHandler";
 
-function ObjectDetection() {
+function DetectionPage() {
   return (
     <div className="container">
       <VoiceHandler />
@@ -11,4 +12,4 @@ function ObjectDetection() {
   );
 }
 
-export default ObjectDetection;
+export default DetectionPage;
