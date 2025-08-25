@@ -4,19 +4,21 @@ import { UserProvider, UserContext } from './context/UserContext';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import NavigationPage from './pages/NavigationPage';
+import DetectionPage from './pages/DetectionPage';
 import SosPage from './pages/SosPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
-import GlobalVoiceCommands from './components/GlobalVoiceCommands';
+import VoiceController from './components/VoiceController';
 import './App.css';
 
 function MainAppLayout() {
   return (
     <>
-      <GlobalVoiceCommands />
+      <VoiceController />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/navigation" element={<NavigationPage />} />
+        <Route path="/detection" element={<DetectionPage />} />
         <Route path="/sos" element={<SosPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
