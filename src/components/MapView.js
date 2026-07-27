@@ -92,13 +92,12 @@ const MapView = () => {
   // --- Initial location ---
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        setCurrentLocation([pos.coords.latitude, pos.coords.longitude]),
+      (pos) => setCurrentLocation([pos.coords.latitude, pos.coords.longitude]),
       (err) => {
         console.error("Geolocation error:", err);
         setStatus("Location error");
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
     return () => {
       if (watchIdRef.current !== null)
@@ -123,14 +122,15 @@ const MapView = () => {
     };
     window.addEventListener("nav:navigateTo", handleNav);
     return () => window.removeEventListener("nav:navigateTo", handleNav);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLocation]);
 
   const geocode = async (q) => {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(
-          q
-        )}`
+          q,
+        )}`,
       );
       const data = await res.json();
       return data?.[0]
@@ -186,7 +186,10 @@ const MapView = () => {
           dist > FINAL_ALERT_DIST
         ) {
           speak(
-            stepText(next, `In ${formatDistance(Math.max(dist, FINAL_ALERT_DIST))}, `)
+            stepText(
+              next,
+              `In ${formatDistance(Math.max(dist, FINAL_ALERT_DIST))}, `,
+            ),
           );
           guidanceRef.current.preAnnouncedIdx = idx;
         }
@@ -206,7 +209,7 @@ const MapView = () => {
         }
       },
       (err) => console.error("watchPosition error:", err),
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 },
     );
   };
 
@@ -235,7 +238,10 @@ const MapView = () => {
           </Marker>
         )}
         {route.length > 0 && (
-          <Polyline positions={route} pathOptions={{ color: "#33e28a", weight: 5 }} />
+          <Polyline
+            positions={route}
+            pathOptions={{ color: "#33e28a", weight: 5 }}
+          />
         )}
       </MapContainer>
       <div className="map-status-overlay">{status}</div>

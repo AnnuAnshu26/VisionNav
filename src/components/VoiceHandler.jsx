@@ -1,14 +1,21 @@
-import React, { useEffect, useRef, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { UserContext } from '../context/UserContext';
-import { api } from '../api/client';
+import React, { useEffect, useRef, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { UserContext } from "../context/UserContext";
+import { api } from "../api/client";
 
 const VoiceHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useContext(UserContext);
-  const { transcript, listening, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
+  const {
+    transcript,
+    listening,
+    browserSupportsSpeechRecognition,
+    resetTranscript,
+  } = useSpeechRecognition();
 
   const listeningStarted = useRef(false);
   const commandLock = useRef(false);
@@ -22,7 +29,10 @@ const VoiceHandler = () => {
     }
     const startMic = () => {
       if (!listeningStarted.current) {
-        SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
+        SpeechRecognition.startListening({
+          continuous: true,
+          language: "en-IN",
+        });
         listeningStarted.current = true;
       }
     };
@@ -44,85 +54,112 @@ const VoiceHandler = () => {
       let cmd = transcript.toLowerCase().trim();
 
       // Remove filler words
-      cmd = cmd.replace(/please|the|to/gi, "").replace(/\.$/, "").trim();
+      cmd = cmd
+        .replace(/please|the|to/gi, "")
+        .replace(/\.$/, "")
+        .trim();
 
       // --- Always allow back/home regardless of page ---
-      if (cmd.includes('go back') || cmd === 'back') {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Going back."));
+      if (cmd.includes("go back") || cmd === "back") {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance("Going back."),
+        );
         navigate(-1);
-      } else if (cmd.includes('home') || cmd.includes('main page')) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Navigating to home."));
-        navigate('/');
-      } else if (cmd.includes('profile')) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Navigating to profile."));
-        navigate('/profile');
-      } else if (cmd.includes('settings')) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Navigating to settings."));
-        navigate('/settings');
-      } else if (cmd.includes('sos') || cmd.includes('help')) {
+      } else if (cmd.includes("home") || cmd.includes("main page")) {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance("Navigating to home."),
+        );
+        navigate("/");
+      } else if (cmd.includes("profile")) {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance("Navigating to profile."),
+        );
+        navigate("/profile");
+      } else if (cmd.includes("settings")) {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance("Navigating to settings."),
+        );
+        navigate("/settings");
+      } else if (cmd.includes("sos") || cmd.includes("help")) {
         sendEmergencySMS();
-      } else if (cmd.includes('report')) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Opening report page."));
-        navigate('/report');
+      } else if (cmd.includes("report")) {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance("Opening report page."),
+        );
+        navigate("/report");
       } else if (cmd.match(/^(navigate|go)\s+.+/)) {
         // --- Robust navigation command ---
         const placeMatch = cmd.match(/(?:navigate|go)\s+(.+)/);
         const place = placeMatch ? placeMatch[1].trim() : "";
         if (place) {
-          window.speechSynthesis.speak(new SpeechSynthesisUtterance(`Navigating to ${place}.`));
-          window.dispatchEvent(new CustomEvent('nav:navigateTo', { detail: { place } }));
-          if (location.pathname !== '/navigation') navigate('/navigation');
+          window.speechSynthesis.speak(
+            new SpeechSynthesisUtterance(`Navigating to ${place}.`),
+          );
+          window.dispatchEvent(
+            new CustomEvent("nav:navigateTo", { detail: { place } }),
+          );
+          if (location.pathname !== "/navigation") navigate("/navigation");
         } else {
-          window.speechSynthesis.speak(new SpeechSynthesisUtterance("Please say the destination clearly."));
+          window.speechSynthesis.speak(
+            new SpeechSynthesisUtterance("Please say the destination clearly."),
+          );
         }
-      } 
+      }
       resetTranscript();
       commandLock.current = false;
     }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transcript, navigate, resetTranscript, location.pathname]);
-
   // --- SOS Function ---
   const sendEmergencySMS = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation not supported by your browser');
+      alert("Geolocation not supported by your browser");
       return;
     }
-    const emergencyNumber = user?.emergencyContact || '8375004426';
+    const emergencyNumber = user?.emergencyContact || "8375004426";
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         const mapLink = `http://google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        const emergencyMessage = encodeURIComponent(`Emergency! Help needed. My location: ${mapLink}`);
+        const emergencyMessage = encodeURIComponent(
+          `Emergency! Help needed. My location: ${mapLink}`,
+        );
         const smsLink = `sms:${emergencyNumber}?body=${emergencyMessage}`;
         window.open(smsLink);
         try {
-          await api.createSos({ lat: latitude, lng: longitude, emergencyContact: emergencyNumber });
+          await api.createSos({
+            lat: latitude,
+            lng: longitude,
+            emergencyContact: emergencyNumber,
+          });
         } catch (e) {
-          console.error('Failed to log SOS alert on server:', e.message);
+          console.error("Failed to log SOS alert on server:", e.message);
         }
       },
-      () => alert('Unable to retrieve location for SOS message.')
+      () => alert("Unable to retrieve location for SOS message."),
     );
   };
 
-  if (location.pathname === '/home' || location.pathname === '/') return null;
+  if (location.pathname === "/home" || location.pathname === "/") return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '20px',
-      right: '20px',
-      backgroundColor: '#fff',
-      padding: '10px 20px',
-      borderRadius: '30px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-      display: 'flex',
-      alignItems: 'center',
-      zIndex: 1000,
-      transition: 'background-color 0.3s',
-    }}>
-      <span style={{ marginRight: '15px', color: '#333', fontStyle: 'italic' }}>
-        {listening ? (transcript || 'Listening...') : 'Mic Off'}
+    <div
+      style={{
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        backgroundColor: "#fff",
+        padding: "10px 20px",
+        borderRadius: "30px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+        display: "flex",
+        alignItems: "center",
+        zIndex: 1000,
+        transition: "background-color 0.3s",
+      }}
+    >
+      <span style={{ marginRight: "15px", color: "#333", fontStyle: "italic" }}>
+        {listening ? transcript || "Listening..." : "Mic Off"}
       </span>
       <button
         onClick={() => {
@@ -133,17 +170,17 @@ const VoiceHandler = () => {
           }
         }}
         style={{
-          border: 'none',
-          background: listening ? '#4CAF50' : '#f44336',
-          color: 'white',
-          borderRadius: '50%',
-          width: '40px',
-          height: '40px',
-          fontSize: '20px',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
+          border: "none",
+          background: listening ? "#4CAF50" : "#f44336",
+          color: "white",
+          borderRadius: "50%",
+          width: "40px",
+          height: "40px",
+          fontSize: "20px",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         🎤
