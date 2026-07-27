@@ -1,0 +1,78 @@
+.sos-container {
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.sos-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 60px;
+  gap: 22px;
+}
+
+.sos-trigger {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger);
+  color: #2a0505;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 0 10px var(--danger-wash);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.sos-trigger:hover:not(:disabled) {
+  transform: scale(1.03);
+  box-shadow: 0 0 0 14px var(--danger-wash);
+}
+
+.sos-trigger:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.sos-trigger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.sos-trigger-icon {
+  font-size: 2.6rem;
+}
+
+.sos-status {
+  text-align: center;
+  color: var(--text-dim);
+  min-height: 1.4em;
+}
+
+.sos-info {
+  width: 100%;
+  text-align: center;
+}
+
+.sos-info p {
+  margin-bottom: 6px;
+}
+
+.sos-contact {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.sos-note {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}

@@ -1,28 +1,29 @@
 .settings-container {
-  padding: 2rem;
-  max-width: 500px;
-  margin: 2rem auto;
-  font-family: sans-serif;
+  padding-bottom: 96px;
+  max-width: 480px;
+  margin: 0 auto;
 }
+
 .settings-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px 20px 0;
+  padding: 24px;
 }
+
 .logout-button {
   display: block;
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #dc3545;
-  color: white;
+  width: calc(100% - 40px);
+  margin: 16px 20px 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 93, 93, 0.35);
+  border-radius: var(--radius-sm);
+  background: var(--danger-wash);
+  color: var(--danger);
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s var(--ease);
 }
+
 .logout-button:hover {
-  background-color: #c82333;
+  background: rgba(255, 93, 93, 0.22);
 }

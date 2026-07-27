@@ -1,21 +1,42 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../context/UserContext';import './ProfilePage.css'; // You'll need to create this CSS file
+import { UserContext } from '../context/UserContext';
+import PageHeader from '../components/PageHeader';
+import BottomNav from '../components/BottomNav';
+import '../App.css';
+import './ProfilePage.css';
 
 const ProfilePage = () => {
   const { user } = useContext(UserContext);
 
   if (!user) {
-    return <div className="profile-container">Loading...</div>;
+    return (
+      <div className="profile-container">
+        <PageHeader title="Your Profile" />
+        <div className="card profile-card">Loading…</div>
+      </div>
+    );
   }
 
   return (
     <div className="profile-container">
-      <h2>Your Profile</h2>
-      <div className="profile-card">
-        <p><strong>Name:</strong> {user.name}</p>
-        <p><strong>Contact Number:</strong> {user.contactNumber}</p>
-        <p><strong>Emergency Contact:</strong> {user.emergencyContact}</p>
+      <PageHeader title="Your Profile" subtitle="Your saved account details" />
+
+      <div className="card profile-card">
+        <div className="profile-row">
+          <span className="label">Name</span>
+          <span className="value">{user.name}</span>
+        </div>
+        <div className="profile-row">
+          <span className="label">Contact Number</span>
+          <span className="value">{user.contactNumber}</span>
+        </div>
+        <div className="profile-row">
+          <span className="label">Emergency Contact</span>
+          <span className="value">{user.emergencyContact}</span>
+        </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 };

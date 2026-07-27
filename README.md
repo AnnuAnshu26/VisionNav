@@ -1,70 +1,135 @@
-# Getting Started with Create React App
+# NavAssist (VisionNav)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack accessibility companion app for visually-impaired users: real-time obstacle
+detection, voice-guided navigation, hazard reporting, and an SOS button — with a working
+backend for accounts, hazard reports, and SOS logs.
 
-## Available Scripts
+## Why nothing here needs a paid AI key or hits a daily limit
 
-In the project directory, you can run:
+- **Object detection** runs 100% in the browser using **TensorFlow.js + COCO-SSD**. The
+  model downloads once (cached by the browser) and then does every prediction on-device.
+  No API key, no per-request cost, no rate limit.
+- **Voice commands & speech feedback** use the browser's built-in **Web Speech API**
+  (`SpeechRecognition` / `speechSynthesis`) — free, built into Chrome/Edge, no external calls.
+- **Maps, geocoding and routing** use the free public **OpenStreetMap Nominatim** and
+  **OSRM** APIs. These are shared public demo servers — fine for personal/dev use and
+  testing, but if you ever get heavy real-world traffic you should self-host Nominatim/OSRM
+  or switch to a paid provider (Mapbox, Google) for reliability.
+- **Accounts, hazard reports and SOS history** are handled by a small **Node/Express
+  backend included in this repo** (`/backend`) — nothing calls out to a third-party AI
+  service, so there's no external quota to hit at all.
 
-### `npm start`
+## Project structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+VisionNav/
+├── backend/            # Express API: auth, profile, hazard reports, SOS logging
+│   ├── src/
+│   │   ├── server.js
+│   │   ├── auth.js
+│   │   ├── db.js
+│   │   └── routes/
+│   ├── data/           # JSON "database" files, created automatically at runtime
+│   └── .env.example
+├── src/                # React frontend
+│   ├── api/client.js   # fetch wrapper that talks to the backend
+│   ├── components/     # ObjectDetection, MapView, VoiceHandler
+│   ├── context/         # UserContext (auth state)
+│   └── pages/           # Login, Home, Navigation, Detection, Report, SOS, Settings, Profile
+└── .env.example
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Requirements
 
-### `npm test`
+- Node.js 18+ and npm
+- A webcam (for obstacle detection) and a browser that supports `getUserMedia`,
+  `SpeechRecognition`, and `speechSynthesis` — **Chrome or Edge is recommended**;
+  Firefox/Safari don't fully support the Web Speech recognition API.
+- HTTPS or `localhost` for camera/microphone/geolocation permissions to work (browsers
+  block these on plain `http://` non-localhost origins).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 1. Run the backend
 
-### `npm run build`
+```bash
+cd backend
+cp .env.example .env      # optionally edit JWT_SECRET
+npm install
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+You should see:
+```
+NavAssist backend running on http://localhost:5000
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Data is stored as plain JSON files in `backend/data/` (`users.json`, `reports.json`,
+`sos.json`) — no database server to install. Delete those files any time to reset the app.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Quick health check: `curl http://localhost:5000/api/health`
 
-### `npm run eject`
+## 2. Run the frontend
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+In a second terminal, from the project root:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+cp .env.example .env       # points the app at http://localhost:5000/api by default
+npm install
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This opens `http://localhost:3000`. On first load you'll land on the **Create Account**
+tab — register with a name, a 10-digit phone number, an optional emergency contact
+number, and a password. That calls the real backend, hashes your password, and returns a
+JWT that's stored in `localStorage` for future logins.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Using the app
 
-## Learn More
+- **Home** — quick links to Navigation, Detection, SOS, Report.
+- **Navigation** — say "navigate <place>" (mic is always listening once logged in) or use
+  the map; it geocodes the place, draws a walking route, and gives turn-by-turn spoken
+  directions as you move.
+- **Detection** — turns on your camera and speaks out loud what it sees ("Detected
+  person", "Detected chair", etc.), throttled so it doesn't repeat constantly.
+- **Report** — tap a spot on the map, describe the hazard and severity, and submit; it's
+  saved on the backend and shown to every user in the "Recent Hazard Reports" list.
+- **SOS** — grabs your GPS location, logs the alert on the backend, and opens your
+  device's SMS app with a pre-filled message to your emergency contact (you still have to
+  press Send — browsers can't send SMS on their own).
+- **Settings** — update your name/contact/emergency number (persisted via the backend) or
+  log out.
+- Say **"go back"**, **"home"**, **"profile"**, **"settings"**, **"report"**, or
+  **"sos"/"help"** at any time — the global voice handler listens continuously.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Backend API reference
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+| Method | Path              | Auth | Body                                              | Description               |
+|--------|-------------------|------|----------------------------------------------------|----------------------------|
+| POST   | /api/auth/register| No   | name, contactNumber, emergencyContact, password    | Create an account          |
+| POST   | /api/auth/login   | No   | contactNumber, password                            | Log in, get a JWT          |
+| GET    | /api/auth/me      | Yes  | —                                                   | Get the current user       |
+| PUT    | /api/profile      | Yes  | name?, contactNumber?, emergencyContact?           | Update profile             |
+| GET    | /api/reports      | Yes  | —                                                   | List all hazard reports    |
+| POST   | /api/reports      | Yes  | location, lat?, lng?, issue, severity              | Create a hazard report     |
+| GET    | /api/sos          | Yes  | —                                                   | List your own SOS alerts   |
+| POST   | /api/sos          | Yes  | lat?, lng?, emergencyContact?                       | Log a new SOS alert        |
 
-### Code Splitting
+Authenticated routes expect `Authorization: Bearer <token>`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Deploying for real use
 
-### Analyzing the Bundle Size
+- Swap the JSON file store for Postgres/MongoDB if you expect concurrent writers at scale
+  (the JSON store uses last-write-wins, fine for a demo or small user base).
+- Set a strong, random `JWT_SECRET` in `backend/.env` in production.
+- Serve the frontend over HTTPS (required by most browsers for camera/mic/location) and
+  point `REACT_APP_API_URL` at your deployed backend URL.
+- If you outgrow the public Nominatim/OSRM servers' fair-use limits, self-host them or
+  switch to a commercial routing/geocoding provider.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Troubleshooting
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **"Could not reach the NavAssist server"** — the backend isn't running, or
+  `REACT_APP_API_URL` in your frontend `.env` doesn't match where it's running.
+- **Mic/camera/location permission prompts don't appear** — make sure you're on
+  `http://localhost:3000` (not a raw IP) or HTTPS.
+- **Voice recognition does nothing** — use Chrome or Edge; Firefox and Safari don't
+  support the SpeechRecognition API used here.

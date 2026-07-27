@@ -31,7 +31,16 @@ function MainAppLayout() {
 }
 
 function AppContent() {
-  const { user } = useContext(UserContext);
+  const { user, loading } = useContext(UserContext);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#00ff88', background: '#111', fontSize: '1.2rem' }}>
+        Loading NavAssist…
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/*" element={user ? <MainAppLayout /> : <Navigate to="/login" />} />

@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { UserContext } from '../context/UserContext';
+import { api } from '../api/client';
 
 const VoiceHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useContext(UserContext);
   const { transcript, listening, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 
   const listeningStarted = useRef(false);
@@ -84,14 +87,19 @@ const VoiceHandler = () => {
       alert('Geolocation not supported by your browser');
       return;
     }
+    const emergencyNumber = user?.emergencyContact || '8375004426';
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
         const mapLink = `http://google.com/maps/search/?api=1&query=${latitude},${longitude}`;
         const emergencyMessage = encodeURIComponent(`Emergency! Help needed. My location: ${mapLink}`);
-        const emergencyNumber = '1234567890'; // Replace with real number
         const smsLink = `sms:${emergencyNumber}?body=${emergencyMessage}`;
         window.open(smsLink);
+        try {
+          await api.createSos({ lat: latitude, lng: longitude, emergencyContact: emergencyNumber });
+        } catch (e) {
+          console.error('Failed to log SOS alert on server:', e.message);
+        }
       },
       () => alert('Unable to retrieve location for SOS message.')
     );

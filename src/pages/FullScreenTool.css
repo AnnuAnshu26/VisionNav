@@ -1,0 +1,21 @@
+.tool-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.tool-page .page-header {
+  padding-bottom: 12px;
+  max-width: none;
+}
+
+.tool-viewport {
+  flex: 1;
+  min-height: 0;
+  margin: 0 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+}

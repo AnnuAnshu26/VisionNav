@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ms3ozd1analhan",
+    "userId": "ms3oxu4jxfr3v7",
+    "triggeredBy": "Anshu Yadav",
+    "lat": 28.579594474624194,
+    "lng": 77.19339318014829,
+    "emergencyContact": "9817116312",
+    "createdAt": "2026-07-27T20:41:14.686Z"
+  },
+  {
+    "id": "ms3ozkptny5f7f",
+    "userId": "ms3oxu4jxfr3v7",
+    "triggeredBy": "Anshu Yadav",
+    "lat": 28.579594474624194,
+    "lng": 77.19339318014829,
+    "emergencyContact": "9817116312",
+    "createdAt": "2026-07-27T20:41:24.641Z"
+  },
+  {
+    "id": "ms3qk1nfkzdh76",
+    "userId": "ms3oxu4jxfr3v7",
+    "triggeredBy": "Anshu Yadav",
+    "lat": 28.579766314598874,
+    "lng": 77.19341556328446,
+    "emergencyContact": "9817116312",
+    "createdAt": "2026-07-27T21:25:19.323Z"
+  }
+]

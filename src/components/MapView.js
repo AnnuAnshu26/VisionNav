@@ -9,6 +9,7 @@ import {
   Polyline,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "./MapView.css";
 
 // Fix Leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -79,6 +80,9 @@ const MapView = () => {
         break;
       case "arrive":
         action = "You have arrived at your destination";
+        break;
+      default:
+        action = "Continue";
         break;
     }
     const street = step?.name ? ` onto ${step.name}` : "";
@@ -207,17 +211,13 @@ const MapView = () => {
   };
 
   if (!currentLocation)
-    return <div className="p-4">📍 Getting your location…</div>;
+    return <div className="map-loading">📍 Getting your location…</div>;
 
   return (
-    <div
-      className="relative h-full w-full"
-      style={{ height: "100vh", width: "100%" }}
-    >
+    <div className="map-root">
       <MapContainer
         center={currentLocation}
         zoom={15}
-        className="h-full w-full"
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
@@ -235,12 +235,10 @@ const MapView = () => {
           </Marker>
         )}
         {route.length > 0 && (
-          <Polyline positions={route} pathOptions={{ color: "blue" }} />
+          <Polyline positions={route} pathOptions={{ color: "#33e28a", weight: 5 }} />
         )}
       </MapContainer>
-      <div className="absolute bottom-5 right-5 bg-white px-4 py-2 rounded shadow text-sm">
-        {status}
-      </div>
+      <div className="map-status-overlay">{status}</div>
     </div>
   );
 };

@@ -1,36 +1,148 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
+/* ==========================================================================
+   NavAssist design tokens — one dark, high-contrast theme used everywhere.
+   Built for readability at a glance: large touch targets, strong contrast,
+   a single confident accent, and a recurring "radar" motif that reflects
+   what the app actually does — sensing what's around you.
+   ========================================================================== */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0e12;
+  --surface: #141a21;
+  --surface-2: #1c2530;
+  --border: #2a333e;
+
+  /* Text */
+  --text: #f4f7f9;
+  --text-dim: #9aa5b1;
+  --text-faint: #6b7684;
+
+  /* Accent (detection / active / safe) */
+  --accent: #33e28a;
+  --accent-strong: #1fb86e;
+  --accent-wash: rgba(51, 226, 138, 0.12);
+
+  /* Semantic */
+  --danger: #ff5d5d;
+  --danger-wash: rgba(255, 93, 93, 0.14);
+  --warning: #ffb020;
+
+  /* Shape & motion */
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Type */
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
-  padding: 0;
 }
 
-.container {
-  text-align: center;
-  padding: 2rem;
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2 {
-  color: #333;
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  margin: 0;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin: 10px 0;
+p {
+  margin: 0;
+  color: var(--text-dim);
 }
 
 a {
-  text-decoration: none;
-  color: white;
-  background: #007bff;
-  padding: 10px 15px;
-  border-radius: 5px;
+  color: var(--accent);
 }
 
-a:hover {
-  background: #0056b3;
+button {
+  font-family: var(--font-body);
+}
+
+/* Visible keyboard focus everywhere — this app is used by people who may
+   rely on assistive tech, so a default browser outline is not optional. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent-wash);
+  color: var(--text);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Shared building blocks reused across pages ------------------------------ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-chip .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+}
+
+.status-chip.dot-live .dot {
+  animation: pulse-dot 1.6s var(--ease) infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px var(--accent-wash);
+  }
+  50% {
+    box-shadow: 0 0 0 8px var(--accent-wash);
+  }
 }

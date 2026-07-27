@@ -1,17 +1,35 @@
 .profile-container {
-  padding: 2rem;
-  text-align: center;
-  font-family: sans-serif;
+  padding-bottom: 96px;
+  max-width: 480px;
+  margin: 0 auto;
 }
+
 .profile-card {
-  background: white;
-  display: inline-block;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: left;
+  margin: 20px;
+  padding: 24px;
 }
-.profile-card p {
-  margin: 0.5rem 0;
+
+.profile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.profile-row .label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profile-row .value {
   font-size: 1.1rem;
+  color: var(--text);
 }
